@@ -7,7 +7,7 @@
   "name": "localscan",
   "version": "1.0.0",
   "description": "dscan tool for Eve Online",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
