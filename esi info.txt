@@ -1,0 +1,2 @@
+ship class (group) https://esi.evetech.net/ui/#/Universe/get_universe_groups_group_id  
+inneholder ship group https://esi.evetech.net/latest/universe/types/587/?datasource=tranquility&language=en
