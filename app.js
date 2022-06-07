@@ -1,6 +1,7 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
+const https = require("https");
 
 app.set('view engine', 'ejs');
 
@@ -11,9 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 function parseScan(data) {
-    // console.log(data);
     const splitLines = str => str.split(/\r?\n/);
-
     const dataArray = splitLines(data);
     const returnArray = [];
 
@@ -27,14 +26,21 @@ function parseScan(data) {
         }
 
         returnArray.push(shipData);
-
-        // console.log(shipData);
-        // console.log(dataArray[i]);
     }
 
     return returnArray;
+}
 
-    // console.log(dataArray);
+function getShipType(id) {
+    const endpoint = "https://esi.evetech.net/latest/universe/types/" + id + "/?datasource=tranquility&language=en";
+    https.get(endpoint, function (response) {
+        console.log(response.statusCode);
+        response.on("data", function (data) {
+            console.log(JSON.parse(data));
+        });
+    });
+
+    console.log("Endpoint = " + endpoint);
 }
 
 function getScanSummary(data) {
@@ -42,17 +48,19 @@ function getScanSummary(data) {
 
     for (let i = 0; i < data.length; i++) {
         dataLine = data[i];
-        console.log(dataLine);
 
-        console.log("dataline[id] = " + dataLine['id'])
         if (dataLine['id'] in countedData) {
             countedData[dataLine['id']] = countedData[dataLine['id']] + 1;
+            getShipType(dataLine['id']);
         } else {
             countedData[dataLine['id']] = 1;
         }
     }
 
     console.log(countedData);
+
+
+    return countedData;
 }
 
 
