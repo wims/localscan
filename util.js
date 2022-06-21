@@ -1,7 +1,16 @@
-module.exports.parseScan = parseScan;
+module.exports.isDscan = isDscan;
+function isDscan(data) {
+    const splitLines = str => str.split(/\r?\n/);
+    const dataArray = splitLines(data);
+    const scanArray = dataArray[0].split("    ");
+    if (scanArray.length == 4) return true;
+    else return false;
+}
 
+module.exports.parseScan = parseScan;
 // Parses scan data from the webform
 function parseScan(data) {
+    // 12005    Cosmic Anomaly    Ishtar    -
     countedShips = {};
     const splitLines = str => str.split(/\r?\n/);
     const dataArray = splitLines(data);

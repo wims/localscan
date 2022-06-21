@@ -25,9 +25,11 @@ app.get("/request", function (req, res) {
 
 app.post("/", function (req, res) {
     const scanData = utils.parseScan(req.body.paste);
-
-    // localscan.getLocalScanSummary(req.body.paste);
-    dscan.getScanSummary(scanData);
+    if (utils.isDscan(req.body.paste)) {
+        dscan.getScanSummary(scanData);
+    } else {
+        localscan.getLocalScanSummary(req.body.paste);
+    }
 
     res.sendFile(__dirname + "/post.html");
 });

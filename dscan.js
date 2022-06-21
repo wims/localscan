@@ -42,7 +42,7 @@ function getShipType(id) {
             var parsed = "";
             var group_id = "";
 
-            // // console.log(response.statusCode);
+            // console.log(response.statusCode);
 
             // concatenate received data
             response.on("data", function (data) {
