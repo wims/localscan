@@ -2,6 +2,8 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 const https = require("https");
+const tls = require('node:tls');
+
 const { waitForDebugger } = require("inspector");
 
 app.set('view engine', 'ejs');
@@ -11,9 +13,84 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 var shiptype = "";
 var countedShips = {};
+var userIdList = {};
 var countedClasses = new Map();
 const shipClasses = new Map();
 const shipNames = new Map();
+
+
+function generatePostData(scanData) {
+    var ret = '["';
+    var temp = "";
+    for (var i = 0; i < scanData.length; i++) {
+        if (scanData[i] != "\n") {
+            temp = temp + scanData[i];
+        } else {
+            ret = ret + temp.substring(0, temp.length - 1) + '", "';
+            temp = "";
+        }
+    }
+
+    ret = ret + temp + '"]';
+
+    console.log("ret = ", ret);
+    return ret;
+}
+
+function runRequest(scanData) {
+    // var postData = "[\"miws vokan\" , \"Gumzy Krango\"]";
+    var postData = generatePostData(scanData);
+
+    const options = {
+        hostname: 'esi.evetech.net',
+        port: 443,
+        path: '/latest/universe/ids/',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': postData.length,
+        }
+    };
+    options.agent = new https.Agent(options);
+
+    return new Promise((resolve, reject) => {
+        console.log("ScanData = ", scanData);
+
+        var data = "";
+        const req = https.request(options, (res) => {
+            res.on('data', (d) => {
+                data = data + d;
+            });
+
+            res.on('error', (e) => {
+                console.error(e.message);
+            });
+
+            res.on('end', () => {
+                resolve(userIdList = JSON.parse(data));
+            })
+        });
+
+        req.on('error', (e) => {
+            console.error(e.message);
+        });
+
+        req.write(postData);
+
+        req.end();
+    });
+}
+
+async function getLocalScanSummary(scanData) {
+    // shiptype = await getShipType(dataLine['id']);
+    var req = await runRequest(scanData);
+    writeUserIds();
+}
+
+function writeUserIds() {
+    console.log("writeUserIds():");
+    console.log("userIdList = ", userIdList);
+}
 
 // Parses scan data from the webform
 function parseScan(data) {
@@ -63,6 +140,7 @@ function getShipType(id) {
 
                 endpoint = "https://esi.evetech.net/latest/universe/groups/" + group_id + "/?datasource=tranquility&language=en";
 
+                https.get()
                 https.get(endpoint, function (response) {
                     dataVal = "";
                     response.on("data", function (data) {
@@ -85,7 +163,6 @@ function getShipType(id) {
 
 async function getScanSummary(scanData) {
     for (let i = 0; i < scanData.length; i++) {
-        console.log("i = " + i);
         dataLine = scanData[i];
 
         if (dataLine['id'] in countedShips) {
@@ -99,14 +176,7 @@ async function getScanSummary(scanData) {
         } else {
             shiptype = await getShipType(dataLine['id']);
         }
-
-        console.log("Ship type = " + shiptype);
     }
-    //console.log(countedShips);
-    console.log("End for loop");
-
-    console.log("Counted data: ", countedShips);
-    console.log("Ship classes: ", shipClasses);
     writeSummary();
 
     // return countedShips;
@@ -123,20 +193,18 @@ function sumClasses() {
         count += countedShips[key];
 
         countedClasses.set(shipClass, count);
-        console.log("shipClass = ", shipClass, "  count = ", count);
     }
 }
 
 function writeSummary() {
     sumClasses();
+
     for (const key in countedShips) {
         console.log("ship_id = ", key, " count = ", countedShips[key], "name = ", shipNames.get(key), "class = ", shipClasses.get(key));
     }
-
     console.log("-----------------");
 
     for (const key of countedClasses.keys()) {
-        // problemet er at shipClasses forventer en id, ikke ett klassenavn
         console.log("class id = ", key, "count = ", countedClasses.get(key));
     }
 }
@@ -146,20 +214,18 @@ app.get("/", function (request, response) {
     response.sendFile(__dirname + "/post.html");
 });
 
+app.get("/request", function (req, res) {
+    getLocalScanSummary();
+    res.sendFile(__dirname + "/post.html");
+});
+
 app.post("/", function (req, res) {
-    var paste = req.body.paste;
-    // testJsonParser();
-    const scanData = parseScan(paste);
-    console.log(scanData);
+    const scanData = parseScan(req.body.paste);
 
-    getScanSummary(scanData);
-    console.log("Finished getScanSummary");
-
-    // console.log("Scan summary = " + scanSummary);
-
+    getLocalScanSummary(req.body.paste);
+    // getScanSummary(scanData);
 
     res.sendFile(__dirname + "/post.html");
-
 });
 
 app.listen(3000, function () {
