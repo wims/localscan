@@ -1,4 +1,5 @@
 const https = require("https");
+const tls = require('node:tls');
 
 var shiptype = "";
 var countedShips = {};
@@ -8,6 +9,7 @@ const shipNames = new Map();
 
 module.exports.getScanSummary = getScanSummary;
 async function getScanSummary(scanData) {
+    // console.log("getScanSummary():");
     for (let i = 0; i < scanData.length; i++) {
         dataLine = scanData[i];
 
@@ -30,6 +32,7 @@ async function getScanSummary(scanData) {
 
 
 function getShipType(id) {
+    // console.log("getShipType():");
     return new Promise((resolve, reject) => {
         var endpoint = "https://esi.evetech.net/latest/universe/types/" + id + "/?datasource=tranquility&language=en";
 
@@ -39,29 +42,32 @@ function getShipType(id) {
             var parsed = "";
             var group_id = "";
 
-            // console.log(response.statusCode);
+            // // console.log(response.statusCode);
 
             // concatenate received data
             response.on("data", function (data) {
                 dataVal = dataVal + data;
+                // console.log("Getting data...");
             });
 
             // when all data have been received, run this
             response.on("end", function () {
+                // console.log("end");
 
                 parsed = JSON.parse(dataVal);
                 group_id = parsed['group_id'];
 
                 endpoint = "https://esi.evetech.net/latest/universe/groups/" + group_id + "/?datasource=tranquility&language=en";
 
-                https.get()
                 https.get(endpoint, function (response) {
                     dataVal = "";
                     response.on("data", function (data) {
+                        // console.log("Getting data again");
                         dataVal = dataVal + data;
                     });
 
                     response.on("end", function () {
+                        // console.log("Ending again");
                         parsed = JSON.parse(dataVal);
                         // console.log("name = " + parsed['name']);
                         shiptype = parsed['name'];
@@ -76,6 +82,7 @@ function getShipType(id) {
 }
 
 function sumClasses() {
+    // console.log("sumClasses():");
     for (const key in countedShips) {
         var count = 0;
         var shipClass = shipClasses.get(key);
@@ -90,6 +97,7 @@ function sumClasses() {
 }
 
 function writeSummary() {
+    // console.log("writeSummary():");
     sumClasses();
 
     for (const key in countedShips) {
