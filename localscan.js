@@ -69,6 +69,10 @@ async function getLocalScanSummary(scanData) {
     writeUserIds();
 }
 
+function getStandingsList() {
+
+}
+
 function writeUserIds() {
     console.log("writeUserIds():");
     console.log("userIdList = ", userIdList);
