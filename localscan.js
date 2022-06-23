@@ -44,6 +44,7 @@ function runRequest(scanData) {
             });
 
             res.on('error', (e) => {
+                console.log("Error!");
                 console.error(e.message);
             });
 

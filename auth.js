@@ -3,6 +3,8 @@ const env = require('dotenv').config();
 const passport = require("passport");
 const EveOnlineStrategy = require("passport-eveonline");
 
+var output = "";
+
 
 passport.use(new EveOnlineStrategy({
     clientID: env.parsed.SSO_CLIENT_ID,
@@ -22,9 +24,11 @@ passport.use(new EveOnlineStrategy({
 ));
 
 function replyToSSO(code) {
+    console.log("DEBUG: replyToSSO():");
     const tokens = "" + env.parsed.SSO_CLIENT_ID + ":" + env.parsed.SSO_SECRET_KEY;
     const buf = Buffer.from(tokens);
-    const b64EncodedTokens = buf.toString('base64');
+    const b64EncodedTokens = "Basic " + buf.toString('base64');
+
     const options = {
         hostname: 'login.eveonline.com',
         port: 443,
@@ -48,18 +52,23 @@ function replyToSSO(code) {
         const req = https.request(options, (res) => {
             res.on('data', (d) => {
                 data = data + d;
+                console.log(d);
             });
 
             res.on('error', (e) => {
+                console.log("ERROR!");
                 console.error(e.message);
             });
 
             res.on('end', () => {
-                resolve(userIdList = JSON.parse(data));
+                console.log("Data length = ", data.length);
+                // resolve(output = data);
+                resolve(output = JSON.parse(data));
             })
         });
 
         req.on('error', (e) => {
+            console.log("Outer error!");
             console.error(e.message);
         });
 
@@ -71,11 +80,13 @@ function replyToSSO(code) {
 
 module.exports.startSSO = startSSO;
 async function startSSO(code) {
+    console.log("DEBUG: startSSO():");
     var response = await replyToSSO(code);
     console.log("response = ", response);
 }
 
 module.exports.authenticate = authenticate;
-function authenticate(strategy) {
-    passport.authenticate(strategy);
+async function authenticate(strategy) {
+    console.log("DEBUG: authenticate():");
+    await passport.authenticate(strategy);
 }
