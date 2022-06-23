@@ -22,13 +22,16 @@ passport.use(new EveOnlineStrategy({
 ));
 
 function replyToSSO(code) {
+    const tokens = "" + env.parsed.SSO_CLIENT_ID + ":" + env.parsed.SSO_SECRET_KEY;
+    const buf = Buffer.from(tokens);
+    const b64EncodedTokens = buf.toString('base64');
     const options = {
         hostname: 'login.eveonline.com',
         port: 443,
         path: '/v2/oauth/token',
         method: 'POST',
         headers: {
-            'Authorization': 'Basic YzQ1ZTQ4YWZjMzZhNDhjNmI2NzQzMTUzMDUxZTc2OGM6Z1pEZ3VlcFRUbWUxYmx1a291VlNvOE44ZEFQRm9XM2NwU0hWWmFrQw==',
+            'Authorization': b64EncodedTokens,
             'Content-Type': 'application/x-www-form-urlencoded',
             'Host': 'login.eveonline.com'
         },
