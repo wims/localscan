@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<body>
+    <% if (typeof character !="undefined" ) { %>
+        <p>
+            Welcome <%= character.CharacterName %>
+        </p>
+        <% } %>
+            <form method="POST" action="/">
+                <textarea name="paste"></textarea>
+                <button type="submit">Submit</button>
+            </form>
+            <form method="GET" action="/signon">
+                <button type="submit">Login</button>
+            </form>
+</body>
+
+</html>

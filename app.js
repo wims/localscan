@@ -3,6 +3,8 @@ const https = require("https");
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
+const ejs = require('ejs');
+
 
 const utils = require(__dirname + '/util.js');
 const localscan = require(__dirname + "/localscan.js")
@@ -20,12 +22,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 app.get("/", function (request, response) {
-    response.sendFile(__dirname + "/post.html");
+    response.render("home");
 });
 
 app.get("/request", function (req, res) {
     redis.connect();
-    res.sendFile(__dirname + "/post.html");
+    res.render("home");
 });
 
 // app.get("/sso-callback", passport.authenticate('eveonline', {
@@ -41,7 +43,7 @@ app.get("/sso-callback", function (req, res) {
 
     auth.startSSO(code, state, res);
     // console.log("Welcome, ", auth.userData);
-    res.sendFile(__dirname + "/post.html");
+    // res.sendFile("home");
 });
 
 app.get("/signon", function (req, res) {
@@ -58,7 +60,7 @@ app.post("/", function (req, res) {
         localscan.getLocalScanSummary(req.body.paste);
     }
 
-    res.sendFile(__dirname + "/post.html");
+    res.render("home");
 });
 
 app.listen(3000, function () {

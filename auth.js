@@ -2,6 +2,7 @@ const https = require("https");
 const env = require('dotenv').config();
 const passport = require("passport");
 const EveOnlineStrategy = require("passport-eveonline");
+const ejs = require('ejs');
 
 var output = "";
 module.exports.userData = userData;
@@ -127,7 +128,7 @@ async function getPublicData(token, res) {
     console.log("DEBUG: getPublicData()");
     var character = await runRequest(token);
     console.log("Character = ", character);
-    // res.redirect(__dirname + "/post.html");
+    res.render("home", { character: character });
 }
 
 module.exports.startSSO = startSSO;
