@@ -67,6 +67,7 @@ module.exports.getLocalScanSummary = getLocalScanSummary;
 async function getLocalScanSummary(scanData) {
     // shiptype = await getShipType(dataLine['id']);
     var req = await runRequest(scanData);
+    console.log("req = ", req);
     writeUserIds();
 }
 

@@ -37,16 +37,17 @@ app.get("/request", function (req, res) {
 app.get("/sso-callback", function (req, res) {
     console.log("res = ", req.query);
     const code = req.query.code;
+    const state = req.query.state;
 
-    auth.startSSO(code);
+    auth.startSSO(code, state, res);
+    // console.log("Welcome, ", auth.userData);
     res.sendFile(__dirname + "/post.html");
 });
 
 app.get("/signon", function (req, res) {
-    res.redirect('https://login.eveonline.com/v2/oauth/authorize/?response_type=code&redirect_uri=http://127.0.0.1:3000/sso-callback/&client_id=c45e48afc36a48c6b6743153051e768c&scope=esi-characters.read_contacts.v1&state=wims5');
-    console.log("pre authenticate");
+    // res.redirect('https://login.eveonline.com/v2/oauth/authorize/?response_type=code&redirect_uri=http://127.0.0.1:3000/sso-callback/&client_id=c45e48afc36a48c6b6743153051e768c&scope=esi-characters.read_contacts.v1%20esi-corporations.read_contacts.v1%20esi-alliances.read_contacts.v1&state=wims5');
+    res.redirect('https://login.eveonline.com/v2/oauth/authorize/?response_type=code&redirect_uri=http://127.0.0.1:3000/sso-callback/&client_id=c45e48afc36a48c6b6743153051e768c&scope=publicData&state=logon');
     auth.authenticate('eveonline');
-    console.log("post authenticate");
 });
 
 app.post("/", function (req, res) {
