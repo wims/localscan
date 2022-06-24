@@ -1,3 +1,6 @@
+const https = require("https");
+
+
 module.exports.isDscan = isDscan;
 function isDscan(data) {
     const splitLines = str => str.split(/\r?\n/);
@@ -30,4 +33,37 @@ function parseScan(data) {
     }
 
     return returnData;
+}
+
+module.exports.htmlRequest = htmlRequest;
+function htmlRequest(options, payload) {
+    options.agent = new https.Agent(options);
+
+    return new Promise((resolve, reject) => {
+        var data = "";
+        const req = https.request(options, (res) => {
+            res.on('data', (d) => {
+                data = data + d;
+                // console.log(d);
+            });
+
+            res.on('error', (e) => {
+                console.log("ERROR!");
+                console.error(e.message);
+            });
+
+            res.on('end', () => {
+                resolve(output = JSON.parse(data));
+            })
+        });
+
+        req.on('error', (e) => {
+            console.log("Outer error!");
+            console.error(e.message);
+        });
+
+        if (payload != "") req.write(payload);
+
+        req.end();
+    });
 }

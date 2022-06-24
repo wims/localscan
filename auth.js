@@ -1,6 +1,7 @@
-const https = require("https");
+// const https = require("https");
+const utils = require(__dirname + '/util.js');
 const env = require('dotenv').config();
-const ejs = require('ejs');
+// const ejs = require('ejs');
 
 var output = "";
 module.exports.userData = userData;
@@ -12,38 +13,6 @@ function b64EncodedToken() {
     const buf = Buffer.from(tokens);
     const b64EncodedTokens = "Basic " + buf.toString('base64');
     return b64EncodedTokens;
-}
-
-function htmlRequest(options, payload) {
-    options.agent = new https.Agent(options);
-
-    return new Promise((resolve, reject) => {
-        var data = "";
-        const req = https.request(options, (res) => {
-            res.on('data', (d) => {
-                data = data + d;
-                // console.log(d);
-            });
-
-            res.on('error', (e) => {
-                console.log("ERROR!");
-                console.error(e.message);
-            });
-
-            res.on('end', () => {
-                resolve(output = JSON.parse(data));
-            })
-        });
-
-        req.on('error', (e) => {
-            console.log("Outer error!");
-            console.error(e.message);
-        });
-
-        if (payload != "") req.write(payload);
-
-        req.end();
-    });
 }
 
 async function getPublicData(token, res) {
@@ -58,7 +27,7 @@ async function getPublicData(token, res) {
             'Authorization': auth_string,
         }
     };
-    var character = await htmlRequest(options, "");
+    var character = await utils.htmlRequest(options, "");
 
 
     var path = "/latest/characters/" + character.CharacterID + "/";
@@ -71,7 +40,7 @@ async function getPublicData(token, res) {
 
     var payload = "";
 
-    var pubData = await htmlRequest(options, payload);
+    var pubData = await utils.htmlRequest(options, payload);
     // var pubData = await getCharacterPubInfo(character.CharacterID);
     console.log("Character = ", character);
     console.log("pubData = ", pubData);
@@ -95,7 +64,7 @@ async function loginWithToken(refresh_token) {
 
     var payload = "grant_type=refresh_token&refresh_token=" + refresh_token;
 
-    var res = await htmlRequest(options, payload);
+    var res = await utils.htmlRequest(options, payload);
     // var response = await loginRefreshToken("vDGckDeca0ScBVgrg9V8aA==");
     console.log("res = ", res);
 }
@@ -116,7 +85,7 @@ async function startSSO(code, state, res) {
     };
 
     var payload = "grant_type=authorization_code&code=" + code;
-    var response = await htmlRequest(options, payload);
+    var response = await utils.htmlRequest(options, payload);
     // var response = await getAccessToken(code);
     console.log("response = ", response);
     getPublicData(response.access_token, res);
