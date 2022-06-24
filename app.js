@@ -52,6 +52,10 @@ app.get("/signon", function (req, res) {
     auth.authenticate('eveonline');
 });
 
+app.get("/token_signon", function (req, res) {
+    auth.loginWithToken();
+});
+
 app.post("/", function (req, res) {
     const scanData = utils.parseScan(req.body.paste);
     if (utils.isDscan(req.body.paste)) {
@@ -62,6 +66,7 @@ app.post("/", function (req, res) {
 
     res.render("home");
 });
+
 
 app.listen(3000, function () {
     console.log("The server was started, listening on port 3000");
