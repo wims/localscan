@@ -37,13 +37,15 @@ app.get("/request", function (req, res) {
 
 
 app.get("/sso-callback", function (req, res) {
-    console.log("res = ", req.query);
+    console.log("ip = ", req.socket.remoteAddress);
+    console.log("query = ", req.query);
+    console.log("res = ", res);
     const code = req.query.code;
     const state = req.query.state;
 
     auth.startSSO(code, state, res);
     // console.log("Welcome, ", auth.userData);
-    // res.sendFile("home");
+    // res.render("home");
 });
 
 app.get("/signon", function (req, res) {

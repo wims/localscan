@@ -54,7 +54,7 @@ function htmlRequest(options, payload) {
 
             res.on('end', () => {
                 resolve(output = JSON.parse(data));
-            })
+            });
         });
 
         req.on('error', (e) => {

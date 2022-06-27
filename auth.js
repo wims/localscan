@@ -29,6 +29,8 @@ async function getPublicData(token, res) {
     };
     var character = await utils.htmlRequest(options, "");
 
+    console.log("character = ", character);
+
 
     var path = "/latest/characters/" + character.CharacterID + "/";
     options = {
@@ -42,7 +44,7 @@ async function getPublicData(token, res) {
 
     var pubData = await utils.htmlRequest(options, payload);
     // var pubData = await getCharacterPubInfo(character.CharacterID);
-    console.log("Character = ", character);
+    // console.log("Character = ", character);
     console.log("pubData = ", pubData);
     res.render("home", { character: character });
 }
@@ -66,7 +68,7 @@ async function loginWithToken(refresh_token) {
 
     var res = await utils.htmlRequest(options, payload);
     // var response = await loginRefreshToken("vDGckDeca0ScBVgrg9V8aA==");
-    console.log("res = ", res);
+    // console.log("res = ", res);
 }
 
 module.exports.startSSO = startSSO;
@@ -87,7 +89,7 @@ async function startSSO(code, state, res) {
     var payload = "grant_type=authorization_code&code=" + code;
     var response = await utils.htmlRequest(options, payload);
     // var response = await getAccessToken(code);
-    console.log("response = ", response);
+    // console.log("response = ", response);
     getPublicData(response.access_token, res);
 }
 
