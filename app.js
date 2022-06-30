@@ -4,17 +4,19 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 const ejs = require('ejs');
-
+var cookieParser = require('cookie-parser')
 
 const utils = require(__dirname + '/util.js');
 const localscan = require(__dirname + "/localscan.js")
 const dscan = require(__dirname + "/dscan.js");
 const auth = require(__dirname + "/auth.js");
 const redis = require(__dirname + "/redis.js");
+const mongo = require(__dirname + "/mongo.js")
 
 const { waitForDebugger } = require("inspector");
 
 app.set('view engine', 'ejs');
+app.use(cookieParser());
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -35,11 +37,22 @@ app.get("/request", function (req, res) {
 //     failureRedirect: '/login'
 // }));
 
+app.get("/mondb", function (req, res) {
+    mongo.createDB();
+    mongo.insertRecord('swm');
+    mongo.getRecord('swm');
+});
+
+app.get("/monfind", function (req, res) {
+    mongo.createDB();
+    mongo.getRecord('swm');
+    // mongo.disconnect();
+});
 
 app.get("/sso-callback", function (req, res) {
-    console.log("ip = ", req.socket.remoteAddress);
-    console.log("query = ", req.query);
-    console.log("res = ", res);
+    // console.log("ip = ", req.socket.remoteAddress);
+    // console.log("query = ", req.query);
+    // console.log("res = ", res);
     const code = req.query.code;
     const state = req.query.state;
 

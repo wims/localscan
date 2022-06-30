@@ -14,3 +14,9 @@ async function disconnect() {
     await client.disconnect();
     console.log("Disconnected from database!");
 }
+
+module.exports.saveUser = saveUser;
+async function saveUser(character) {
+    connect();
+
+}

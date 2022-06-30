@@ -1,5 +1,6 @@
 // const https = require("https");
 const utils = require(__dirname + '/util.js');
+const redis = require(__dirname + '/redis.js');
 const env = require('dotenv').config();
 // const ejs = require('ejs');
 
@@ -12,6 +13,13 @@ function b64EncodedToken() {
     const tokens = "" + env.parsed.SSO_CLIENT_ID + ":" + env.parsed.SSO_SECRET_KEY;
     const buf = Buffer.from(tokens);
     const b64EncodedTokens = "Basic " + buf.toString('base64');
+    return b64EncodedTokens;
+}
+
+function b64Encode(part_1, part_2) {
+    const tokens = "" + part_1 + ":" + part_2;
+    const buf = Buffer.from(tokens);
+    const b64EncodedTokens = buf.toString('base64');
     return b64EncodedTokens;
 }
 
@@ -29,7 +37,7 @@ async function getPublicData(token, res) {
     };
     var character = await utils.htmlRequest(options, "");
 
-    console.log("character = ", character);
+    // console.log("character = ", character);
 
 
     var path = "/latest/characters/" + character.CharacterID + "/";
@@ -43,9 +51,15 @@ async function getPublicData(token, res) {
     var payload = "";
 
     var pubData = await utils.htmlRequest(options, payload);
+    character.corporation_id = pubData.corporation_id;
+    character.alliance_id = pubData.alliance_id;
     // var pubData = await getCharacterPubInfo(character.CharacterID);
-    // console.log("Character = ", character);
+    console.log("Character = ", character);
     console.log("pubData = ", pubData);
+    res.cookie('id', b64Encode(character.CharacterID, character.CharacterOwnerHash));
+
+    redis.saveUser(character);
+
     res.render("home", { character: character });
 }
 
