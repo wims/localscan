@@ -1,6 +1,7 @@
 // const https = require("https");
 const utils = require(__dirname + '/util.js');
-const redis = require(__dirname + '/redis.js');
+// const redis = require(__dirname + '/redis.js');
+const mongo = require(__dirname + '/mongo.js');
 const env = require('dotenv').config();
 // const ejs = require('ejs');
 
@@ -23,9 +24,9 @@ function b64Encode(part_1, part_2) {
     return b64EncodedTokens;
 }
 
-async function getPublicData(token, res) {
+async function getPublicData(tokenObject, res) {
     console.log("DEBUG: getPublicData()");
-    const auth_string = "Bearer " + token;
+    const auth_string = "Bearer " + tokenObject.access_token;
     var options = {
         hostname: 'login.eveonline.com',
         port: 443,
@@ -53,12 +54,15 @@ async function getPublicData(token, res) {
     var pubData = await utils.htmlRequest(options, payload);
     character.corporation_id = pubData.corporation_id;
     character.alliance_id = pubData.alliance_id;
+    character.refresh_token = tokenObject.refresh_token;
     // var pubData = await getCharacterPubInfo(character.CharacterID);
     console.log("Character = ", character);
     console.log("pubData = ", pubData);
     res.cookie('id', b64Encode(character.CharacterID, character.CharacterOwnerHash));
 
-    redis.saveUser(character);
+    mongo.connect();
+    mongo.insertRecord(character);
+    // redis.saveUser(character);
 
     res.render("home", { character: character });
 }
@@ -104,7 +108,7 @@ async function startSSO(code, state, res) {
     var response = await utils.htmlRequest(options, payload);
     // var response = await getAccessToken(code);
     // console.log("response = ", response);
-    getPublicData(response.access_token, res);
+    getPublicData(response, res);
 }
 
 module.exports.authenticate = authenticate;

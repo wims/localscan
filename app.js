@@ -10,8 +10,8 @@ const utils = require(__dirname + '/util.js');
 const localscan = require(__dirname + "/localscan.js")
 const dscan = require(__dirname + "/dscan.js");
 const auth = require(__dirname + "/auth.js");
-const redis = require(__dirname + "/redis.js");
-const mongo = require(__dirname + "/mongo.js")
+// const redis = require(__dirname + "/redis.js");
+const mongo = require(__dirname + "/mongo.js");
 
 const { waitForDebugger } = require("inspector");
 
@@ -38,13 +38,13 @@ app.get("/request", function (req, res) {
 // }));
 
 app.get("/mondb", function (req, res) {
-    mongo.createDB();
+    mongo.connect();
     mongo.insertRecord('swm');
     mongo.getRecord('swm');
 });
 
 app.get("/monfind", function (req, res) {
-    mongo.createDB();
+    mongo.connect();
     mongo.getRecord('swm');
     // mongo.disconnect();
 });

@@ -1,15 +1,21 @@
+const { ExplainVerbosity } = require('mongodb');
 var mongoose = require('mongoose');
 
 var mongoDB = 'mongodb://127.0.0.1/localscan';
 var Schema = mongoose.Schema;
 var characterModelSchema = new Schema({
+    characterID: Number,
     characterName: String,
-    dateJoined: Date
+    scopes: String,
+    characterOwnerHash: String,
+    corporationID: Number,
+    allianceID: Number,
+    refresh_token: String
 });
 var CharacterModel = mongoose.model('CharacterModel', characterModelSchema);
 
 
-module.exports.createDB = createDB;
+module.exports.connect = createDB;
 async function createDB() {
     await create();
 }
@@ -26,12 +32,26 @@ function create() {
 }
 
 module.exports.insertRecord = insertRecord;
-function insertRecord(characterName) {
-    var characterInstance = new CharacterModel({ characterName: characterName, dateJoined: new Date() });
+function insertRecord(characterObject) {
+    console.log("characterObject = ", characterObject);
+    var characterInstance = new CharacterModel({
+        characterID: characterObject.CharacterID,
+        characterName: characterObject.CharacterName,
+        scopes: characterObject.Scopes,
+        characterOwnerHash: characterObject.CharacterOwnerHash,
+        corporationID: characterObject.corporation_id,
+        allianceID: characterObject.alliance_id,
+        refresh_token: characterObject.refresh_token
+    });
+
+    // var charInstance = new CharacterModel(characterObject);
     // Save the new model instance, passing a callback
     characterInstance.save(function (err) {
-        if (err) return handleError(err);
-        console.log('Character ' + characterName + " inserted into db!");
+        if (err) {
+            console.log("Error inserting", err);
+            exit();
+        }
+        console.log('Character ' + characterObject + " inserted into db!");
         // saved!
     });
 }
