@@ -1,3 +1,5 @@
+const { ExplainVerbosity } = require('mongodb');
+
 // const https = require("https");
 const utils = require(__dirname + '/util.js');
 // const redis = require(__dirname + '/redis.js');
@@ -38,9 +40,6 @@ async function getPublicData(tokenObject, res) {
     };
     var character = await utils.htmlRequest(options, "");
 
-    // console.log("character = ", character);
-
-
     var path = "/latest/characters/" + character.CharacterID + "/";
     options = {
         hostname: 'esi.evetech.net',
@@ -58,9 +57,11 @@ async function getPublicData(tokenObject, res) {
     // var pubData = await getCharacterPubInfo(character.CharacterID);
     console.log("Character = ", character);
     console.log("pubData = ", pubData);
-    res.cookie('id', b64Encode(character.CharacterID, character.CharacterOwnerHash));
+    // res.cookie('localscan_id', b64Encode(character.CharacterID, character.CharacterOwnerHash));
 
-    mongo.connect();
+    res.cookie('localscan_id', character.CharacterOwnerHash);
+    console.log("Wrote cookie");
+
     mongo.insertRecord(character);
     // redis.saveUser(character);
 
@@ -68,8 +69,10 @@ async function getPublicData(tokenObject, res) {
 }
 
 module.exports.loginWithToken = loginWithToken;
-async function loginWithToken(refresh_token) {
-    if (refresh_token == "") refresh_token = env.parsed.REFRESH_TOKEN_MIWS;
+async function loginWithToken(char_id) {
+    console.log("DEBUG: loginWithToken()");
+    // var char = await mongo.getCharacterInfo(char_id);
+    var char = await mongo.getChar(char_id);
     const options = {
         hostname: 'login.eveonline.com',
         port: 443,
@@ -77,16 +80,17 @@ async function loginWithToken(refresh_token) {
         method: 'POST',
         headers: {
             'Authorization': b64EncodedToken(),
+            // 'Authorization': 'Basic YzQ1ZTQ4YWZjMzZhNDhjNmI2NzQzMTUzMDUxZTc2OGM6Z1pEZ3VlcFRUbWUxYmx1a291VlNvOE44ZEFQRm9XM2NwU0hWWmFrQw==',
             'Content-Type': 'application/x-www-form-urlencoded',
             'Host': 'login.eveonline.com'
         },
     };
 
-    var payload = "grant_type=refresh_token&refresh_token=" + refresh_token;
+    var payload = "grant_type=refresh_token&refresh_token=" + encodeURIComponent(char[0].refresh_token);
 
+    console.log("payload=", payload);
     var res = await utils.htmlRequest(options, payload);
-    // var response = await loginRefreshToken("vDGckDeca0ScBVgrg9V8aA==");
-    // console.log("res = ", res);
+    console.log("res = ", res);
 }
 
 module.exports.startSSO = startSSO;

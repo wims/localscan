@@ -1,5 +1,6 @@
 const { ExplainVerbosity } = require('mongodb');
 var mongoose = require('mongoose');
+const { useCallback } = require('react');
 
 var mongoDB = 'mongodb://127.0.0.1/localscan';
 var Schema = mongoose.Schema;
@@ -13,11 +14,11 @@ var characterModelSchema = new Schema({
     refresh_token: String
 });
 var CharacterModel = mongoose.model('CharacterModel', characterModelSchema);
-
+mongoose.set('debug', { shell: true })
 
 module.exports.connect = createDB;
-async function createDB() {
-    await create();
+function createDB() {
+    create();
 }
 function create() {
     mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -56,20 +57,57 @@ function insertRecord(characterObject) {
     });
 }
 
+module.exports.getChar = getChar;
+async function getChar(characterOwnerHash) {
+    console.log("DEBUG: getChar()");
+    var char = await CharacterModel.find({ characterOwnerHash: characterOwnerHash }).exec();
+    // console.log("char =", char);
+    return char;
+}
+
+// module.exports.getCharacterInfo = getCharacterInfo;
+// async function getCharacterInfo(char_id) {
+//     console.log("DEBUG: getCharacterInfo()");
+//     char = await getCharInfo(char_id);
+//     console.log("char = ", char);
+//     console.log("DEBUG: Returning from getCharacterInfo()");
+//     resolve(char);
+//     // return char;
+// }
+// module.exports.getCharInfo = getCharInfo;
+// function getCharInfo(char_id) {
+//     console.log("DEBUG: getCharInfo()");
+//     return new Promise((resolve, reject) => {
+//         // CharacterModel.find({ characterOwnerHash: char_id }).exec();
+//         CharacterModel.find({ characterOwnerHash: char_id }, function (err, character) {
+//             console.log("In callback");
+//             if (err) {
+//                 console.log("Error trying to find character ", err);
+//                 reject(error);
+//             }
+//             resolve(character);
+//             console.log("Character found! ", character);
+//         });
+//     });
+// }
+
 module.exports.getRecord = getRecord;
-async function getRecord(characterName) {
-    await record(characterName);
+function getRecord(characterName) {
+    console.log("DEBUG: getRecord()");
+    return record(characterName);
 }
 function record(characterName) {
-    CharacterModel.find({ characterName: characterName }, 'characterName dateJoined', function (err, time) {
+    console.log("DEBUG: record()");
+    return CharacterModel.find({ characterName: characterName }, 'characterName dateJoined', function (err, time) {
         if (err) console.log("Error! ", err);
         console.log("The character record was created at ", time);
+        return time;
     });
 }
 
 module.exports.disconnect = disconnect;
-async function disconnect() {
-    await dc();
+function disconnect() {
+    dc();
 }
 function dc() {
     mongoose.disconnect(function (err) {
