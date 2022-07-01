@@ -69,7 +69,7 @@ async function getPublicData(tokenObject, res) {
 }
 
 module.exports.loginWithToken = loginWithToken;
-async function loginWithToken(char_id) {
+async function loginWithToken(char_id, res) {
     console.log("DEBUG: loginWithToken()");
     // var char = await mongo.getCharacterInfo(char_id);
     var char = await mongo.getChar(char_id);
@@ -88,9 +88,9 @@ async function loginWithToken(char_id) {
 
     var payload = "grant_type=refresh_token&refresh_token=" + encodeURIComponent(char[0].refresh_token);
 
-    console.log("payload=", payload);
-    var res = await utils.htmlRequest(options, payload);
-    console.log("res = ", res);
+    var result = await utils.htmlRequest(options, payload);
+    console.log("result=", result);
+    res.render("home", { character: char[0] });
 }
 
 module.exports.startSSO = startSSO;
