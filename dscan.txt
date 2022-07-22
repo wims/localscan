@@ -37,3 +37,43 @@
 3764    Tiny Drake    Leviathan    35 km
 23757    Capital Crimes    Archon    35 km
 11957    7o Falco    Falcon    37 km
+
+
+
+19724	Death Star	Moros	-
+37480	Meep Meep	Bifrost	-
+11963	321123	Rapier	-
+19720	Centurion -AC-	Revelation	-
+33475	Mobile Tractor Unit	Mobile Tractor Unit	-
+19720	 &lt;NC&gt; Revelation	Revelation	-
+11957	Cyno - CDFE	Falcon	-
+22442	Giga Slave	Eos	12 km
+3877	DZ6-I5	Stargate (Minmatar Constellation)	13 km
+45534	VCA Monitor Charlie	Monitor	15 km
+28659	[BFL] The Golden	Paladin	19 km
+22456	Sabre 2019-05-19	Sabre	21 km
+17920	Golden Bhaal	Bhaalgorn	22 km
+22442	Rigs in Cargo	Eos	24 km
+11987	Rhulana's Guardian	Guardian	26 km
+49713	Hellcats	Zarmazd	26 km
+11987	Tanky Guardian	Guardian	26 km
+11987	Hellcat	Guardian	27 km
+22442	Bathtub	Eos	30 km
+11987	bfl	Guardian	31 km
+11987	Tanky Guardian	Guardian	33 km
+45534	.	Monitor	34 km
+11987	Hellcat	Guardian	37 km
+17732	=✪= BUSA #1	Tempest Fleet Issue	39 km
+22442	Evolution of Smooth	Eos	39 km
+22456	BFL Sabre	Sabre	40 km
+11987	Small Nestor	Guardian	41 km
+11987	Guardian	Guardian	42 km
+22456	July 2020 Rigs in Ca	Sabre	42 km
+11987	BFL Golden Tanky Gua	Guardian	46 km
+11387	---	Hyena	47 km
+11987	Hellcat	Guardian	51 km
+11978	Cerberus	Scimitar	52 km
+35835	16AM-3 - 7-1 Sylvite	Athanor	9,1 AU
+32226	Territorial Claim Unit	Territorial Claim Unit	9,1 AU
+32458	Infrastructure Hub	Infrastructure Hub	9,1 AU
+45037	16AM-3 - Star	Sun K5 (Orange Bright)	14,1 AU
