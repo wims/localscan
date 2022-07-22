@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 const ejs = require('ejs');
-var cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser')
 
 const utils = require(__dirname + '/util.js');
 const localscan = require(__dirname + "/localscan.js")
@@ -86,17 +86,18 @@ app.get("/charinfo", async function (req, res) {
     // } catch (error) {
     //     console.log("Error!", error);
     // }
-    mongo.connect();
+    // mongo.connect();
     mongo.getChar("TK62T4bQEzPT5cqQb0MVSzVkJOk=");
 })
 
 
 app.post("/", function (req, res) {
-    const scanData = utils.parseScan(req.body.paste);
     if (utils.isDscan(req.body.paste)) {
-        dscan.getScanSummary(scanData);
+        console.log('Found dscan');
+        dscan.getScanSummary(utils.parseScan(req.body.paste));
     } else {
         localscan.getLocalScanSummary(req.body.paste);
+        console.log('Found localscan');
     }
 
     res.render("home");

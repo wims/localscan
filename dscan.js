@@ -9,7 +9,8 @@ const shipNames = new Map();
 
 module.exports.getScanSummary = getScanSummary;
 async function getScanSummary(scanData) {
-    // console.log("getScanSummary():");
+    console.log("getScanSummary():");
+    console.log("Scandata:", scanData);
     for (let i = 0; i < scanData.length; i++) {
         dataLine = scanData[i];
 
@@ -24,6 +25,9 @@ async function getScanSummary(scanData) {
         } else {
             shiptype = await getShipType(dataLine['id']);
         }
+
+        if (! shipNames.has(dataLine['id']))
+            shipNames.set(dataLine['id'], dataLine['name']);
     }
     writeSummary();
 
@@ -97,7 +101,7 @@ function sumClasses() {
 }
 
 function writeSummary() {
-    // console.log("writeSummary():");
+    console.log("writeSummary():");
     sumClasses();
 
     for (const key in countedShips) {
