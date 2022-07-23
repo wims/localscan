@@ -5,7 +5,6 @@ const utils = require(__dirname + '/util.js');
 const auth = require(__dirname + '/auth.js');
 
 
-var userIdList = {};
 var characterList = new Map();
 
 module.exports.generatePostData = generatePostData;
@@ -96,6 +95,7 @@ async function getLocalScanSummary(scanData, char_id, res) {
     for (var entry of req.characters) {
         var character = {};
         character.name = entry.name;
+        character.id = entry.id;
         characterList.set(entry.id, character);
     }
 
@@ -114,6 +114,8 @@ async function getLocalScanSummary(scanData, char_id, res) {
     var affiliations = await utils.htmlRequest(options, postData);
 
     var contactList = await getContacts(char_id, res);
+    var allianceList = new Map();
+    var corporationList = new Map();
  
     for (var affiliation of affiliations) {
         var character = characterList.get(affiliation.character_id);
@@ -132,8 +134,6 @@ async function getLocalScanSummary(scanData, char_id, res) {
             character.characterStanding = characterStanding;
         }
 
-        
-        postData = "[" + affiliation.alliance_id + ", " + affiliation.corporation_id + "]";
         postData = "[";
         if (affiliation.alliance_id != undefined) postData = postData + affiliation.alliance_id;
         if (postData != "[") postData = postData + ", ";
@@ -146,17 +146,44 @@ async function getLocalScanSummary(scanData, char_id, res) {
             'Content-Length': postData.length,
         };
         var groupnames = await utils.htmlRequest(options, postData);
-        // console.log("postdata =", postData);
-        // console.log("groupnames =", groupnames);
+
         for (var i = 0; i < groupnames.length; i++) {
-            if (groupnames[i].category == 'alliance') character.alliance = groupnames[i].name;
-            if (groupnames[i].category == 'corporation') character.corporation = groupnames[i].name;
+            if (groupnames[i].category == 'alliance') {
+                character.alliance = groupnames[i].name;
+                allianceList.set(character.alliance, {'playerList': new Map()});
+            }
+            if (groupnames[i].category == 'corporation') {
+                character.corporation = groupnames[i].name;
+                corporationList.set(character.corporation, {'playerList': new Map()});
+            }
         }
 
         characterList.set(affiliation.character_id, character);
+
     }
 
-    writeUserIds();
+    for (var character of characterList) {
+        if ('alliance' in character[1]) {
+            var alliance = allianceList.get(character[1].alliance);
+            alliance.playerList.set(character[1].name, character[1].id);
+            allianceList.set(character[1].alliance, alliance);
+        }
+        if ('corporation' in character[1]) {
+            var corporation = corporationList.get(character[1].corporation);
+            corporation.playerList.set(character[1].name, character[1].id);
+            corporationList.set(character[1].corporation, corporation);
+            console.log("corporation.playerList =", corporation.playerList);
+        }
+    }
+
+    var lists = {characterList, allianceList, corporationList};
+
+    // console.log(lists);
+    // console.log(allianceList);
+    
+    // console.log("lists =", lists);
+
+    // writeUserIds();
 }
 
 function writeUserIds() {
