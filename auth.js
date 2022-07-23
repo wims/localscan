@@ -68,10 +68,18 @@ async function getPublicData(tokenObject, res) {
     res.render("home", { character: character });
 }
 
+
 module.exports.loginWithToken = loginWithToken;
 async function loginWithToken(char_id, res) {
     console.log("DEBUG: loginWithToken()");
-    // var char = await mongo.getCharacterInfo(char_id);
+
+    const access_token = await getNewAccessToken(char_id);
+    var char = await mongo.getChar(char_id);
+    res.render("home", { character: char[0] });
+}
+
+module.exports.getNewAccessToken = getNewAccessToken;
+async function getNewAccessToken(char_id) {
     var char = await mongo.getChar(char_id);
     const options = {
         hostname: 'login.eveonline.com',
@@ -90,7 +98,7 @@ async function loginWithToken(char_id, res) {
 
     var result = await utils.htmlRequest(options, payload);
     console.log("result=", result);
-    res.render("home", { character: char[0] });
+    return result.access_token;
 }
 
 module.exports.startSSO = startSSO;
@@ -111,7 +119,7 @@ async function startSSO(code, state, res) {
     var payload = "grant_type=authorization_code&code=" + code;
     var response = await utils.htmlRequest(options, payload);
     // var response = await getAccessToken(code);
-    // console.log("response = ", response);
+    console.log("response = ", response);
     getPublicData(response, res);
 }
 
