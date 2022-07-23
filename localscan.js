@@ -92,23 +92,18 @@ async function getLocalScanSummary(scanData, char_id, res) {
     };
 
     req = await utils.htmlRequest(options, postData);
-    // var characterList = new Map();
 
     for (var entry of req.characters) {
-        var val = {};
-        val.name = entry.name;
-        characterList.set(entry.id, val);
-        // console.log("Entry =", entry);
+        var character = {};
+        character.name = entry.name;
+        characterList.set(entry.id, character);
     }
-
-    console.log("req =", req);
 
     postData = "[";
     for (var character of req.characters) {
         postData  = postData + character.id + ", ";
     }
     postData = postData.substring(0, postData.length - 2) + "]";
-    console.log("postData = ", postData);
 
     options.path = '/latest/characters/affiliation/';
     options.headers = {
@@ -119,41 +114,46 @@ async function getLocalScanSummary(scanData, char_id, res) {
     var affiliations = await utils.htmlRequest(options, postData);
 
     var contactList = await getContacts(char_id, res);
-
-    console.log("contactList size =", contactList.size);
-    console.log("affiliations =", affiliations);
-    
+ 
     for (var affiliation of affiliations) {
+        var character = characterList.get(affiliation.character_id);
+
         var allianceStanding = contactList.get(affiliation.alliance_id);
         var corporationStanding = contactList.get(affiliation.corporation_id);
-        var personalStanding = contactList.get(affiliation.character_id);
-        var character = characterList.get(affiliation.character_id);
+        var characterStanding = contactList.get(affiliation.character_id);
+        
         if (allianceStanding != undefined) {
-            character.standing = allianceStanding;
+            character.allianceStanding = allianceStanding;
         }
         if (corporationStanding != undefined) {
-            character.standing = corporationStanding;
+            character.corporationStanding = corporationStanding;
         }
-        if (personalStanding != undefined) {
-            character.standing = personalStanding;
+        if (characterStanding != undefined) {
+            character.characterStanding = characterStanding;
         }
 
+        
         postData = "[" + affiliation.alliance_id + ", " + affiliation.corporation_id + "]";
+        postData = "[";
+        if (affiliation.alliance_id != undefined) postData = postData + affiliation.alliance_id;
+        if (postData != "[") postData = postData + ", ";
+        if (affiliation.corporation_id != undefined) postData = postData + affiliation.corporation_id;
+        postData = postData + "]";
+
         options.path = '/latest/universe/names/';
         options.headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Content-Length': postData.length,
         };
         var groupnames = await utils.htmlRequest(options, postData);
-        console.log("postData =", postData);
-        console.log("groupnames = ", groupnames);
-        character.corporation = groupnames[0].name;
-        character.alliance = groupnames[1].name;
-
+        // console.log("postdata =", postData);
+        // console.log("groupnames =", groupnames);
+        for (var i = 0; i < groupnames.length; i++) {
+            if (groupnames[i].category == 'alliance') character.alliance = groupnames[i].name;
+            if (groupnames[i].category == 'corporation') character.corporation = groupnames[i].name;
+        }
 
         characterList.set(affiliation.character_id, character);
-
-        console.log("contact", character);
     }
 
     writeUserIds();
