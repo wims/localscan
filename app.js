@@ -4,10 +4,10 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 const ejs = require('ejs');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 
 const utils = require(__dirname + '/util.js');
-const localscan = require(__dirname + "/localscan.js")
+const localscan = require(__dirname + "/localscan.js");
 const dscan = require(__dirname + "/dscan.js");
 const auth = require(__dirname + "/auth.js");
 // const redis = require(__dirname + "/redis.js");
@@ -91,15 +91,15 @@ app.get("/charinfo", async function (req, res) {
 });
 
 app.get("/contacts", function(req, res) {
-    localscan.getContacts(req.cookies.localscan_id, res);
+    localscan.getContacts(req.cookies.localscan_id);
 });
 
 app.post("/", function (req, res) {
     if (utils.isDscan(req.body.paste)) {
         console.log('Found dscan');
-        dscan.getScanSummary(utils.parseScan(req.body.paste));
+        dscan.getScanSummary(utils.parseScan(req.body.paste, ));
     } else {
-        localscan.getLocalScanSummary(req.body.paste);
+        localscan.getLocalScanSummary(req.body.paste, req.cookies.localscan_id, res);
         console.log('Found localscan');
     }
 

@@ -6,6 +6,7 @@ const auth = require(__dirname + '/auth.js');
 
 
 var userIdList = {};
+var characterList = new Map();
 
 module.exports.generatePostData = generatePostData;
 function generatePostData(scanData) {
@@ -26,7 +27,7 @@ function generatePostData(scanData) {
 }
 
 module.exports.getContacts = getContacts;
-async function getContacts(char_id, res) {
+async function getContacts(char_id) {
     const accessToken = await auth.getNewAccessToken(char_id);
     var authString = "Bearer " + accessToken;
     var char = await mongo.getChar(char_id);
@@ -76,9 +77,7 @@ async function getContacts(char_id, res) {
 }
 
 module.exports.getLocalScanSummary = getLocalScanSummary;
-async function getLocalScanSummary(scanData) {
-    // shiptype = await getShipType(dataLine['id']);
-    // var req = await runRequest(scanData);
+async function getLocalScanSummary(scanData, char_id, res) {
     var postData = generatePostData(scanData);
 
     const options = {
@@ -93,6 +92,16 @@ async function getLocalScanSummary(scanData) {
     };
 
     req = await utils.htmlRequest(options, postData);
+    // var characterList = new Map();
+
+    for (var entry of req.characters) {
+        var val = {};
+        val.name = entry.name;
+        characterList.set(entry.id, val);
+        // console.log("Entry =", entry);
+    }
+
+    console.log("req =", req);
 
     postData = "[";
     for (var character of req.characters) {
@@ -105,16 +114,52 @@ async function getLocalScanSummary(scanData) {
     options.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Content-Length': postData.length,
-    }
+    };
 
     var affiliations = await utils.htmlRequest(options, postData);
 
+    var contactList = await getContacts(char_id, res);
+
+    console.log("contactList size =", contactList.size);
     console.log("affiliations =", affiliations);
     
+    for (var affiliation of affiliations) {
+        var allianceStanding = contactList.get(affiliation.alliance_id);
+        var corporationStanding = contactList.get(affiliation.corporation_id);
+        var personalStanding = contactList.get(affiliation.character_id);
+        var character = characterList.get(affiliation.character_id);
+        if (allianceStanding != undefined) {
+            character.standing = allianceStanding;
+        }
+        if (corporationStanding != undefined) {
+            character.standing = corporationStanding;
+        }
+        if (personalStanding != undefined) {
+            character.standing = personalStanding;
+        }
+
+        postData = "[" + affiliation.alliance_id + ", " + affiliation.corporation_id + "]";
+        options.path = '/latest/universe/names/';
+        options.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': postData.length,
+        };
+        var groupnames = await utils.htmlRequest(options, postData);
+        console.log("postData =", postData);
+        console.log("groupnames = ", groupnames);
+        character.corporation = groupnames[0].name;
+        character.alliance = groupnames[1].name;
+
+
+        characterList.set(affiliation.character_id, character);
+
+        console.log("contact", character);
+    }
+
     writeUserIds();
 }
 
 function writeUserIds() {
     console.log("writeUserIds():");
-    console.log("userIdList = ", userIdList);
+    console.log("userIdList = ", characterList);
 }
