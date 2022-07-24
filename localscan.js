@@ -182,7 +182,6 @@ async function getLocalScanSummary(scanData, char_id, res) {
             var set = false;
             for (let i = 0; i < temp.length; i++){
                 var tempSize = corpList.get(temp[i]).playerList.size;
-                console.log("tempsize=",tempSize);
                 if (corpSize > tempSize) {
                     temp.splice(i, 0, name);
                     set = true;
@@ -197,6 +196,8 @@ async function getLocalScanSummary(scanData, char_id, res) {
         sortedCorps.set(temp[i], lists.corporationList.get(temp[i]));
     }
     lists.corporationList = sortedCorps;
+
+    console.log("Alliances =", lists.allianceList);
 
     res.render("localscan", {localScan: lists});
 }
