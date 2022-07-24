@@ -1,0 +1,14 @@
+.main {
+    display: flex;
+    flex-direction: row;
+    background-color: DodgerBlue;
+}
+.main > div {
+    background-color: #f1f1f1;
+    margin: 10px;
+    width: 50%;
+    text-align: center;
+    line-height: 75px;
+    font-size: 30px;
+  }
+  

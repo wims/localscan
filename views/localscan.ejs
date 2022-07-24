@@ -1,0 +1,33 @@
+<script>
+    window.history.pushState("", "", '/');
+</script>
+<!DOCTYPE HTML>
+<html lang="en">
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+<body>
+    <div class='main'>
+        <div class="alliance">
+            <div>
+                <p>Alliances</p>
+            </div>
+            <% localScan.allianceList.forEach(function (alliance, name, playerList) { %>
+                <div>
+                    <%= name %>
+                    <%= alliance.playerList.size %> 
+                </div>
+            <% }); %>
+        </div>
+        <div class="corporation">
+            <div>
+                <p>Corporations</p>
+            </div>
+            <% localScan.corporationList.forEach(function (corporation, name, playerList) { %>
+                <div>
+                    <%= name %>
+                    <%= corporation.playerList.size %> 
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</body>

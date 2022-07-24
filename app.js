@@ -18,7 +18,7 @@ const { waitForDebugger } = require("inspector");
 app.set('view engine', 'ejs');
 app.use(cookieParser());
 
-app.use(express.static("public"));
+app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 mongo.connect();
@@ -97,13 +97,14 @@ app.get("/contacts", function(req, res) {
 app.post("/", function (req, res) {
     if (utils.isDscan(req.body.paste)) {
         console.log('Found dscan');
-        dscan.getScanSummary(utils.parseScan(req.body.paste, ));
+        dscan.getScanSummary(utils.parseScan(req.body.paste, res));
     } else {
-        localscan.getLocalScanSummary(req.body.paste, req.cookies.localscan_id, res);
+        var scan = localscan.getLocalScanSummary(req.body.paste, req.cookies.localscan_id, res);
         console.log('Found localscan');
+        // res.render("localscan", {localscan: scan});
     }
 
-    res.render("home");
+    // res.render("home");
 });
 
 

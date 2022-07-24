@@ -113,7 +113,7 @@ async function getLocalScanSummary(scanData, char_id, res) {
 
     var affiliations = await utils.htmlRequest(options, postData);
 
-    var contactList = await getContacts(char_id, res);
+    var contactList = await getContacts(char_id);
     var allianceList = new Map();
     var corporationList = new Map();
  
@@ -172,21 +172,19 @@ async function getLocalScanSummary(scanData, char_id, res) {
             var corporation = corporationList.get(character[1].corporation);
             corporation.playerList.set(character[1].name, character[1].id);
             corporationList.set(character[1].corporation, corporation);
-            console.log("corporation.playerList =", corporation.playerList);
         }
     }
 
     var lists = {characterList, allianceList, corporationList};
+    console.log("lists =", lists);
 
-    // console.log(lists);
-    // console.log(allianceList);
+    lists.corporationList.forEach(function(corporation, name, playerList) {
+        console.log("Corp:", name);
+        console.log("Num players:", corporation.playerList.size);
+        console.log("playerlist:", corporation.playerList);
+    })
     
-    // console.log("lists =", lists);
 
-    // writeUserIds();
-}
-
-function writeUserIds() {
-    console.log("writeUserIds():");
-    console.log("userIdList = ", characterList);
+    res.render("localscan", {localScan: lists});
+    // return lists;
 }
