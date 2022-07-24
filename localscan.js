@@ -68,11 +68,7 @@ async function getContacts(char_id) {
         contactList.set(contact.contact_id, contact.standing);
     }
 
-    // console.log("Contact list has " + contactList.size + " elements");
-
     return contactList;
-    
-    // res.render("home", { character: char[0] });
 }
 
 module.exports.getLocalScanSummary = getLocalScanSummary;
@@ -159,7 +155,6 @@ async function getLocalScanSummary(scanData, char_id, res) {
         }
 
         characterList.set(affiliation.character_id, character);
-
     }
 
     for (var character of characterList) {
@@ -176,15 +171,32 @@ async function getLocalScanSummary(scanData, char_id, res) {
     }
 
     var lists = {characterList, allianceList, corporationList};
-    console.log("lists =", lists);
 
-    lists.corporationList.forEach(function(corporation, name, playerList) {
-        console.log("Corp:", name);
-        console.log("Num players:", corporation.playerList.size);
-        console.log("playerlist:", corporation.playerList);
-    })
-    
+    // Sorts corp list by number of players
+    var temp = [];
+    lists.corporationList.forEach(function(corporation, name, corpList) {
+        var corpSize = corporation.playerList.size;
+        if (temp.length==0) { 
+            temp.push(name);
+        } else {
+            var set = false;
+            for (let i = 0; i < temp.length; i++){
+                var tempSize = corpList.get(temp[i]).playerList.size;
+                console.log("tempsize=",tempSize);
+                if (corpSize > tempSize) {
+                    temp.splice(i, 0, name);
+                    set = true;
+                    break;
+                }
+            }
+            if (!set) temp.push(name);
+        }
+    });
+    var sortedCorps = new Map();
+    for (let i = 0; i < temp.length; i++) {
+        sortedCorps.set(temp[i], lists.corporationList.get(temp[i]));
+    }
+    lists.corporationList = sortedCorps;
 
     res.render("localscan", {localScan: lists});
-    // return lists;
 }
