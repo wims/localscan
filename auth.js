@@ -97,7 +97,7 @@ async function getNewAccessToken(char_id) {
     var payload = "grant_type=refresh_token&refresh_token=" + encodeURIComponent(char[0].refresh_token);
 
     var result = await utils.htmlRequest(options, payload);
-    console.log("result=", result);
+    // console.log("result=", result);
     return result.access_token;
 }
 
@@ -119,7 +119,7 @@ async function startSSO(code, state, res) {
     var payload = "grant_type=authorization_code&code=" + code;
     var response = await utils.htmlRequest(options, payload);
     // var response = await getAccessToken(code);
-    console.log("response = ", response);
+    // console.log("response = ", response);
     getPublicData(response, res);
 }
 

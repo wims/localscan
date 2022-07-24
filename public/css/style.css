@@ -11,4 +11,10 @@
     line-height: 75px;
     font-size: 30px;
   }
-  
+
+.selected {
+    background-color: #c93d3db2;
+}
+.unselected {
+    background-color: none;
+}

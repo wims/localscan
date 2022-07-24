@@ -1,9 +1,28 @@
-<script>
-    window.history.pushState("", "", '/');
-</script>
 <!DOCTYPE HTML>
 <html lang="en">
-<link rel="stylesheet" type="text/css" href="css/style.css" />
+<head>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script>
+        window.history.pushState("", "", '/');
+
+        function mark(id) {
+            console.log("in mark, id=", id);
+            let myDivs = document.getElementsByClassName(id.className);
+            for (let i = 0; i < myDivs.length; i++) {
+                let myDiv = myDivs.item(i);
+                myDiv.style="background-color:red";
+            }
+        }
+
+        function unmark(name) {
+            let myDivs = document.getElementsByClassName(name.className);
+            for (let i = 0; i < myDivs.length; i++) {
+                let myDiv = myDivs.item(i);
+                myDiv.style="background-color:none";
+            }
+        }
+</script>
+</head>
 
 <body>
     <div class='main'>
@@ -12,7 +31,7 @@
                 <p>Alliances</p>
             </div>
             <% localScan.allianceList.forEach(function (alliance, name, playerList) { %>
-                <div>
+                <div class="<%= name %>" onmouseover="mark(this)" onmouseout="unmark(this)">
                     <%= name %>
                     <%= alliance.playerList.size %> 
                 </div>
@@ -23,7 +42,7 @@
                 <p>Corporations</p>
             </div>
             <% localScan.corporationList.forEach(function (corporation, name, playerList) { %>
-                <div>
+                <div class="<%= corporation.alliance + ".corp" %>"onmouseover="mark(this)" onmouseout="unmark(this)">
                     <%= name %>
                     <%= corporation.playerList.size %> 
                 </div>
@@ -31,3 +50,4 @@
         </div>
     </div>
 </body>
+</html>

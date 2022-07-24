@@ -162,8 +162,12 @@ async function getLocalScanSummary(scanData, char_id, res) {
             var alliance = allianceList.get(character[1].alliance);
             alliance.playerList.set(character[1].name, character[1].id);
             allianceList.set(character[1].alliance, alliance);
-        }
-        if ('corporation' in character[1]) {
+
+            var corporation = corporationList.get(character[1].corporation);
+            corporation.playerList.set(character[1].name, character[1].id);
+            corporation.alliance = character[1].alliance;
+            corporationList.set(character[1].corporation, corporation);
+        } else if ('corporation' in character[1]) {
             var corporation = corporationList.get(character[1].corporation);
             corporation.playerList.set(character[1].name, character[1].id);
             corporationList.set(character[1].corporation, corporation);
@@ -198,6 +202,7 @@ async function getLocalScanSummary(scanData, char_id, res) {
     lists.corporationList = sortedCorps;
 
     console.log("Alliances =", lists.allianceList);
+    console.log("coporations =", lists.corporationList);
 
     res.render("localscan", {localScan: lists});
 }
